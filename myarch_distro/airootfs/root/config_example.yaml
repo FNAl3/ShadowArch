@@ -1,0 +1,14 @@
+hostname: mycustomarch
+username: archuser
+password: password123
+root_password: rootpassword123
+timezone: America/New_York
+locale: en_US.UTF_8
+disk: /dev/sda
+packages:
+  - git
+  - firefox
+  - htop
+  - neofetch
+  - gnome
+  - gnome-extra
