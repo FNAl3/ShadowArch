@@ -185,6 +185,13 @@ echo "LANG={locale}" > /etc/locale.conf
 echo "KEYMAP={keymap}" > /etc/vconsole.conf
 echo "{hostname}" > /etc/hostname
 
+# Initialize Pacman Keys
+echo "Initializing Pacman Keys..."
+pacman-key --init
+pacman-key --populate archlinux
+pacman -Sy --noconfirm archlinux-keyring
+
+
 # Root password
 
 echo "root:{root_password}" | chpasswd

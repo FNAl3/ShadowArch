@@ -4,6 +4,7 @@ linux
 linux-firmware
 archinstall
 arch-install-scripts
+archlinux-keyring
 btrfs-progs
 clonezilla
 darkhttpd
@@ -113,7 +114,6 @@ papirus-icon-theme
 nwg-look
 qt5ct
 # Security Tools (Official Repos)
-
 nmap
 wireshark-qt
 tcpdump
@@ -123,30 +123,23 @@ hashcat
 testdisk
 ddrescue
 # Kali-Like Essentials
-
 hydra
 sqlmap
 bettercap
 cherrytree
 obsidian
 ettercap
-
 gobuster
-
 nikto
 exploitdb
 masscan
-
 whois
 bind
 inetutils
-
 medusa
 macchanger
 proxychains-ng
 socat
 tmux
 zmap
-
 # Note: Many tools are in BlackArch repo, added via script
-

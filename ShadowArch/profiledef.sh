@@ -1,4 +1,4 @@
-iso_name="shadowk"
+iso_name="shadowArch"
 iso_label="SHADOWARCH_2025"
 iso_publisher="ShadowK-025 <https://github.com/ArchShadow>"
 iso_application="ShadowArch 025 Live ISO"
@@ -19,4 +19,9 @@ file_permissions=(
   ["/etc/gshadow"]="0:0:400"
   ["/etc/passwd"]="0:0:644"
   ["/etc/group"]="0:0:644"
+  ["/etc/mkinitcpio.conf"]="0:0:644"
+  ["/etc/vconsole.conf"]="0:0:644"
+  ["/etc/locale.conf"]="0:0:644"
+  ["/etc/hostname"]="0:0:644"
+  ["/etc/hosts"]="0:0:644"
 )
