@@ -1,14 +1,12 @@
 iso_name="shadowk"
-iso_label="ShadowArch$(date +%Y%m)"
+iso_label="SHADOWARCH_2025"
 iso_publisher="ShadowK-025 <https://github.com/ArchShadow>"
 iso_application="ShadowArch 025 Live ISO"
 
 iso_version="$(date +%Y.%m.%d)"
 install_dir="arch"
 buildmodes=('iso')
-bootmodes=('bios.syslinux.mbr' 'bios.syslinux.eltorito'
-           'uefi-ia32.grub.esp' 'uefi-x64.grub.esp'
-           'uefi-ia32.grub.eltorito' 'uefi-x64.grub.eltorito')
+bootmodes=('bios.syslinux' 'uefi.grub')
 arch="x86_64"
 pacman_conf="pacman.conf"
 airootfs_image_type="squashfs"
