@@ -47,8 +47,10 @@ nbd
 ndisc6
 nfs-utils
 nilfs-utils
+networkmanager
 nmap
 ntfs-3g
+os-prober
 nvme-cli
 openconnect
 openssh
@@ -56,6 +58,15 @@ openvpn
 partclone
 parted
 partimage
+pipewire
+pipewire-alsa
+pipewire-pulse
+sof-firmware
+alsa-utils
+apache
+mesa
+xf86-input-libinput
+hwinfo
 ppp
 pptpclient
 python

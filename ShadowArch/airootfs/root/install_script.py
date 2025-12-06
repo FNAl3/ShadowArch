@@ -14,7 +14,16 @@ def run_command(command, check=True):
         subprocess.run(command, shell=True, check=check, executable='/bin/bash')
     except subprocess.CalledProcessError as e:
         logging.error(f"Command failed: {e}")
-        sys.exit(1)
+        if check:
+            sys.exit(1)
+
+def check_internet():
+    try:
+        # Check connection to Google DNS
+        subprocess.check_call(["ping", "-c", "1", "8.8.8.8"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 def load_config(config_path):
     with open(config_path, 'r') as f:
@@ -187,29 +196,43 @@ echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 
 # Bootloader (GRUB)
 pacman -S --noconfirm grub efibootmgr
+mkinitcpio -P
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # AUR Tools Installation (Kali-like features)
-echo "Installing AUR tools..."
-pacman -S --noconfirm git base-devel
+# Only run if internet is available
+if ping -c 1 8.8.8.8 &> /dev/null; then
+    echo "Internet detected. Installing AUR tools..."
+    pacman -S --noconfirm git base-devel
 
-# Switch to user to build and install yay and tools
-# We use a heredoc passed to su for complex commands
-su - {username} <<EOF
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si --noconfirm
-cd ..
-rm -rf yay
+    # Switch to user to build and install yay and tools
+    # We use a heredoc passed to su for complex commands
+    su - {username} <<SUBEOF
+    if [ ! -d "yay" ]; then
+        git clone https://aur.archlinux.org/yay.git
+        cd yay
+        makepkg -si --noconfirm
+        cd ..
+        rm -rf yay
+    else
+        echo "yay already exists, skipping clone..."
+    fi
 
-echo "Installing Security Tools from AUR..."
-yay -S --noconfirm metasploit dnsenum2 wafw00f responder ffuf
+    echo "Installing Security Tools from AUR..."
+    yay -S --noconfirm metasploit dnsenum2 wafw00f responder ffuf
+SUBEOF
+else
+    echo "WARNING: No internet connection detected. Skipping AUR tools installation."
+fi
 EOF
 
 # Enable services
+# Enable services
 systemctl enable NetworkManager
 systemctl enable sddm
+systemctl enable sshd
+systemctl enable httpd
 
 """
     with open('/mnt/setup.sh', 'w') as f:
@@ -264,7 +287,7 @@ def main():
     
     packages = config.get('packages', [])
     # Add essential packages if not present
-    essentials = ['vim', 'networkmanager', 'sudo']
+    essentials = ['vim', 'networkmanager', 'sudo', 'os-prober']
     for p in essentials:
         if p not in packages:
             packages.append(p)

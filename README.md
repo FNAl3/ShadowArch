@@ -13,6 +13,10 @@
     *   **Window Manager**: Hyprland (Wayland) with animations and blur.
     *   **Theme**: Dracula (GTK) & Cyberpunk Neon colors.
     *   **Look**: Custom "Kama" Boot Splash and Login Screen.
+*   **🎧 Functional Audio**: Pipewire + WirePlumber + SOF Firmware (supports modern laptops).
+*   **🔌 Enhanced Connectivity**:
+    *   **SSH Server (`sshd`)**: Enabled by default.
+    *   **Web Server (`httpd`)**: Apache pre-installed and enabled.
 *   **⚡ Interactive Installer**: Custom Python script (`install_script.py`) to install the OS in minutes without manual commands.
 
 ---
@@ -153,9 +157,9 @@ The final `.iso` file will be in the `out/` directory (or `/mnt/build_workspace/
 1.  **Boot**: Insert the USB and boot. You will see the **ShadowK Boot Menu** (with the Kama Logo).
 2.  **Login**: Use user `root`. No password is required for the Live environment.
 3.  **Install**:
-    Run the text-based installer:
+    Run the text-based installer directly (it has executable permissions):
     ```bash
-    python /root/install_script.py /root/config_example.yaml
+    ./install_script.py /root/config_example.yaml
     ```
 4.  **Configure**:
     The script will ask for:
