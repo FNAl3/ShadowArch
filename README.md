@@ -1,5 +1,5 @@
 # ShadowK 025
-![ShadowK Logo](logo.png)
+![ShadowK Logo](ShadowArch/logo.png)
 
 **ShadowK 025** is a custom Arch Linux distribution designed for **Security Auditing, Pentesting, and Forensics**. It combines the raw power of Arch Linux with a pre-configured, beautiful **Cyberpunk/Purple** aesthetic (Hyprland) and a complete arsenal of security tools (Kali-Parity + Custom PenTools).
 
