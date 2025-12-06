@@ -17,10 +17,33 @@
 
 ---
 
-## 📂 Project Structure Explained
+## � Build System Infrastructure
 
-Here is what each file/folder does:
+This project uses a custom engineered build system to overcome the limitations of building large ISOs within a Live RAM environment.
 
+### 🏗️ The Architecture
+The build process is split into three intelligent layers to ensure stability and memory management:
+
+#### 1. The Orchestrator (`build.sh`)
+This is the main entry point. It features **Automatic Self-Relocation** logic:
+*   **Detection**: It checks if it is running in RAM (Live ISO) or on Persistent Storage.
+*   **Migration**: If in RAM, it triggers `setup_workspace.sh`.
+*   **Handover**: Once set up, it automatically `exec`s the version of itself located on the hard drive.
+*   **Cache Management**: It creates a local pacman cache on the disk and **bind-mounts** it to `/var/cache/pacman/pkg`, preventing RAM exhaustion during large downloads.
+
+#### 2. The Persistence Manager (`setup_workspace.sh`)
+Handles the physical storage preparation:
+*   **Wipes** the target disk (`/dev/sda`).
+*   **Partitions** it (GPT, 100% space).
+*   **Formats** as EXT4 and mounts to `/mnt/build_workspace`.
+*   **Clones** the entire project repository (including hidden `.git` files) to the new workspace.
+
+#### 3. The Builder (`mkarchiso`)
+Runs inside the persistent workspace context (`-w` work directory forced to disk), ensuring that the temporary build artifacts (which can exceed 10GB) never touch the RAM.
+
+---
+
+## 📂 Source Code Structure
 | File / Folder | Purpose |
 | :--- | :--- |
 | **`profiledef.sh`** | **The Identity**. Defines the ISO name (`shadowk`), version, and file permissions. |
@@ -29,7 +52,6 @@ Here is what each file/folder does:
 | **`syslinux/`** | **The Bootloader**. Contains the boot menu configuration and the custom **boot logo** (`kama_shadowarch.png`). |
 | **`airootfs/`** | **The File System**. Files here are overlayed onto the OS. |
 | `└── root/install_script.py` | **The Installer**. Interactive script to partition disks and install the system. |
-| `└── etc/skel/` | **The Configs**. Dotfiles (Waybar, Hyprland, Kitty) that are copied to the new user. |
 
 ---
 
