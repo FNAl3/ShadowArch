@@ -108,10 +108,29 @@ def mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_pa
     if swap_part:
         run_command(f"swapon {swap_part}")
 
+def install_in_chunks(packages, chunk_size=50):
+    total = len(packages)
+    for i in range(0, total, chunk_size):
+        chunk = packages[i:i + chunk_size]
+        logging.info(f"Installing chunk {i//chunk_size + 1} ({len(chunk)} packages)...")
+        pkg_list = " ".join(chunk)
+        # Using the cache bind mount ensures we don't fill RAM
+        run_command(f"pacstrap /mnt {pkg_list}")
+
 def install_base(packages):
-    logging.info("Installing base system...")
-    pkg_list = " ".join(packages)
-    run_command(f"pacstrap /mnt base linux linux-firmware {pkg_list}")
+    logging.info("Installing system in chunks to save RAM...")
+    
+    # Separation of concerns: Core vs Extra
+    core_packages = ['base', 'linux', 'linux-firmware']
+    extra_packages = [p for p in packages if p not in core_packages]
+    
+    # 1. Install Core first (Essential for boot)
+    logging.info("Installing Core packages (Base/Kernel)...")
+    run_command(f"pacstrap /mnt {' '.join(core_packages)}")
+    
+    # 2. Install Extras in chunks
+    if extra_packages:
+        install_in_chunks(extra_packages)
 
 def generate_fstab():
     logging.info("Generating fstab...")
