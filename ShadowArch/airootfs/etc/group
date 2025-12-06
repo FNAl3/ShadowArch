@@ -1,0 +1,8 @@
+root:x:0:root
+sys:x:3:bin
+network:x:90:
+power:x:98:
+wheel:x:998:
+adm:x:999:
+tty:x:5:
+uucp:x:14:
