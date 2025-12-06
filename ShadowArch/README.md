@@ -67,6 +67,70 @@ The `install_script.py` automatically handles disk partitioning. It enforces a *
 | **Var** (/var) | EXT4 | **15%** | Logs, Pacman Cache, Databases. |
 | **Tmp** (/tmp) | EXT4 | **5%** | Temporary files. |
 | **Home** (/home) | EXT4 | Remainder | User data (~40%). |
+
+> [!WARNING]
+> The installer **wipes the entire target disk**. It does not support dual-boot or manual partitioning in this version.
+
+---
+
+## 🛠️ How to Build (Create the ISO)
+
+You can build ShadowK from a standard Arch Linux install OR from a Live ISO.
+
+### Option A: From a Live ISO (Recommended for Testing)
+*If you are in a temporary VM or USB Live Session:*
+
+1.  **Update Databases & Install Tools**:
+    *Crucial step to avoid "package not found" errors.*
+    ```bash
+    pacman -Sy archiso git curl
+    ```
+
+2.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/FNAl3/ShadowArch.git
+    cd ShadowArch
+    ```
+
+3.  **Run the One-Click Builder**:
+    *This will automatically partition your disk (if blank), move the workspace to persistent storage, and compile the ISO.*
+    ```bash
+    chmod +x build.sh
+    ./build.sh
+    ```
+
+✅ **Result:** Your ISO will be located in `/mnt/build_workspace/out/`.
+
+### Option B: From an Existing Arch System
+*If you already have Arch Linux installed on your machine:*
+
+1.  **Install Prerequisites**:
+    ```bash
+    sudo pacman -S archiso git curl unzip
+    ```
+
+2.  **Get the Code**:
+    ```bash
+    git clone https://github.com/FNAl3/ShadowArch.git
+    cd ShadowArch
+    ```
+
+3.  **Build**:
+    We recommend using our automated wrapper to handle caching:
+    ```bash
+    chmod +x build.sh
+    ./build.sh
+    ```
+    *(Alternatively, you can run `mkarchiso -v -w work -o out .` manually).*
+
+### 4. Locate ISO
+The final `.iso` file will be in the `out/` directory (or `/mnt/build_workspace/out` if using Option A).
+
+---
+
+## 🧪 Deployment / Boot Scenarios
+
+### 🖥️ VirtualBox (Standard Testing)
 1. **Create VM**: New > Type: Linux > Version: Arch Linux (64-bit).
 2. **Resources**:
     *   **RAM**: Minimum 4GB (8GB Recommended).
