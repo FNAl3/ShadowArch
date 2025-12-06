@@ -25,7 +25,7 @@ if [ -d "$PENTOOLS_DIR" ]; then
     cd - > /dev/null
 else
     echo "Cloning PenTools..."
-    git clone "$PENTOOLS_REPO" "$PENTOOLS_DIR"
+    git clone --depth 1 "$PENTOOLS_REPO" "$PENTOOLS_DIR"
 fi
 
 # Make scripts executable
