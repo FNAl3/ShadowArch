@@ -74,7 +74,26 @@ def configure_system(config):
     password = config.get('password', 'password')
     root_password = config.get('root_password', 'root')
     
+    keymap = config.get('keymap', 'us')
+    
+    # Copy custom dotfiles (skel) from Live ISO to Target System
+    logging.info("Copying custom dotfiles...")
+    run_command("cp -r /etc/skel/. /mnt/etc/skel/")
+    
+    # Copy custom themes and backgrounds (since they are not in repos)
+    logging.info("Copying custom themes and assets...")
+    run_command("mkdir -p /mnt/usr/share/themes")
+    run_command("mkdir -p /mnt/usr/share/backgrounds")
+    
+    # Only copy if they exist (to prevent errors if user didn't run download script)
+    if os.path.exists("/usr/share/themes/Dracula"):
+        run_command("cp -r /usr/share/themes/Dracula /mnt/usr/share/themes/")
+        
+    if os.path.exists("/usr/share/backgrounds/shadowk.png"):
+        run_command("cp /usr/share/backgrounds/shadowk.png /mnt/usr/share/backgrounds/")
+    
     # Write configuration script to be run inside chroot
+
     setup_script = f"""
 #!/bin/bash
 ln -sf /usr/share/zoneinfo/{timezone} /etc/localtime
@@ -82,9 +101,11 @@ hwclock --systohc
 echo "{locale} UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG={locale}" > /etc/locale.conf
+echo "KEYMAP={keymap}" > /etc/vconsole.conf
 echo "{hostname}" > /etc/hostname
 
 # Root password
+
 echo "root:{root_password}" | chpasswd
 
 # User creation
@@ -99,6 +120,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # Enable services
 systemctl enable NetworkManager
+systemctl enable sddm
+
 """
     with open('/mnt/setup.sh', 'w') as f:
         f.write(setup_script)
@@ -106,6 +129,14 @@ systemctl enable NetworkManager
     run_command("chmod +x /mnt/setup.sh")
     run_command("arch-chroot /mnt /setup.sh")
     run_command("rm /mnt/setup.sh")
+
+def get_input(prompt, default):
+    response = input(f"{prompt} [{default}]: ").strip()
+    return response if response else default
+
+def confirm_action(prompt):
+    response = input(f"{prompt} (y/N): ").strip().lower()
+    return response == 'y'
 
 def main():
     if len(sys.argv) != 2:
@@ -119,11 +150,25 @@ def main():
         
     config = load_config(config_file)
     
-    disk = config.get('disk')
-    if not disk:
-        print("Disk not specified in config.")
+    # Interactive Configuration Overrides
+    print("\n--- Interactive Configuration ---")
+    config['hostname'] = get_input("Hostname", config.get('hostname', 'archlinux'))
+    config['username'] = get_input("Username", config.get('username', 'user'))
+    config['password'] = get_input("User Password", config.get('password', 'password'))
+    config['root_password'] = get_input("Root Password", config.get('root_password', 'root'))
+    config['disk'] = get_input("Target Disk", config.get('disk', '/dev/sda'))
+    
+    print("\n---------------------------------")
+    print(f"Target Disk: {config['disk']}")
+    print(f"Hostname:    {config['hostname']}")
+    print(f"Username:    {config['username']}")
+    print("---------------------------------")
+    
+    if not confirm_action("WARNING: ALL DATA ON TARGET DISK WILL BE ERASED. Continue?"):
+        print("Aborting installation.")
         sys.exit(1)
-        
+    
+    disk = config.get('disk')
     partition_disk(disk)
     efi_part, root_part = format_partitions(disk)
     mount_partitions(root_part, efi_part)
@@ -138,6 +183,7 @@ def main():
     install_base(packages)
     generate_fstab()
     configure_system(config)
+
     
     logging.info("Installation complete! You can now reboot.")
 

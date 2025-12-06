@@ -1,0 +1,19 @@
+hostname: ArchcKer
+username: ShadowShell
+password: 4387
+root_password: 4387
+timezone: Europe/Paris
+locale: en_US.UTF-8
+keymap: es
+
+disk: /dev/sda
+packages:
+  - git
+  - firefox
+  - htop
+  - neofetch
+  - hyprland
+  - waybar
+  - wofi
+  - kitty
+

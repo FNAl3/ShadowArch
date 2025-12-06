@@ -1,0 +1,114 @@
+* {
+    border: none;
+    font-family: 'JetBrains Mono Nerd Font', 'Font Awesome 6 Free', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+window#waybar {
+    background-color: rgba(15, 15, 25, 0.6);
+    /* Very dark purple/black with transparency */
+    color: #f8f8f2;
+    transition-property: background-color;
+    transition-duration: .5s;
+    border-top: 2px solid #bd93f9;
+    /* Purple border on top */
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+#workspaces {
+    background-color: rgba(40, 42, 54, 0.8);
+    border-radius: 15px;
+    margin: 6px 4px;
+    padding: 2px 2px;
+}
+
+#workspaces button {
+    padding: 0 10px;
+    background-color: transparent;
+    color: #6272a4;
+    border-radius: 15px;
+}
+
+#workspaces button:hover {
+    background: rgba(189, 147, 249, 0.2);
+    color: #bd93f9;
+}
+
+#workspaces button.active {
+    color: #f8f8f2;
+    background-color: #bd93f9;
+    /* Active workspace purple */
+    box-shadow: 0 0 5px #bd93f9;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#network,
+#tray {
+    padding: 4px 12px;
+    margin: 6px 3px;
+    border-radius: 15px;
+    background-color: rgba(40, 42, 54, 0.8);
+    color: #f8f8f2;
+}
+
+#clock {
+    background-color: #bd93f9;
+    /* Purple clock */
+    color: #282a36;
+    margin-right: 15px;
+}
+
+#battery {
+    color: #50fa7b;
+    /* Green */
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #f1fa8c;
+    /* Yellow */
+}
+
+#battery.critical:not(.charging) {
+    background-color: #ff5555;
+    color: #f8f8f2;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#cpu {
+    color: #ff79c6;
+    /* Pink */
+}
+
+#memory {
+    color: #8be9fd;
+    /* Cyan */
+}
+
+#network {
+    color: #bd93f9;
+    /* Purple */
+}
+
+label:focus {
+    background-color: #000000;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}

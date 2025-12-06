@@ -1,7 +1,8 @@
-iso_name="myarchsec"
-iso_label="MYARCHSEC_$(date +%Y%m)"
-iso_publisher="MyArchSec <https://myarchsec.example.com>"
-iso_application="MyArchSec Pentest Live/Rescue CD"
+iso_name="shadowk"
+iso_label="ShadowArch$(date +%Y%m)"
+iso_publisher="ShadowK-025 <https://github.com/ArchShadow>"
+iso_application="ShadowArch 025 Live ISO"
+
 iso_version="$(date +%Y.%m.%d)"
 install_dir="arch"
 buildmodes=('iso')
@@ -15,9 +16,5 @@ airootfs_image_tool_options=('-comp' 'xz' '-Xbcj' 'x86' '-b' '1M' '-Xdict-size' 
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
   ["/root"]="0:0:750"
-  ["/root/.automated_script.sh"]="0:0:755"
   ["/root/install_blackarch.sh"]="0:0:755"
-  ["/usr/local/bin/choose-mirror"]="0:0:755"
-  ["/usr/local/bin/Installation_guide"]="0:0:755"
-  ["/usr/local/bin/livecd-sound"]="0:0:755"
 )

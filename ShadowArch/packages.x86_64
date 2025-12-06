@@ -85,7 +85,25 @@ wvdial
 xfsprogs
 xl2tpd
 zsh
+# Hyprland & Desktop
+hyprland
+waybar
+wofi
+kitty
+sddm
+polkit-kde-agent
+dunst
+xdg-desktop-portal-hyprland
+qt5-wayland
+qt6-wayland
+ttf-font-awesome
+otf-font-awesome
+ttf-jetbrains-mono
+papirus-icon-theme
+nwg-look
+qt5ct
 # Security Tools (Official Repos)
+
 nmap
 wireshark-qt
 tcpdump
@@ -95,4 +113,30 @@ john
 hashcat
 testdisk
 ddrescue
+# Kali-Like Essentials
+metasploit
+hydra
+sqlmap
+bettercap
+ettercap
+dnsenum
+gobuster
+ffuf
+nikto
+exploitdb
+masscan
+responder
+thc-hydra
+whois
+bind # for dig/nslookup
+inetutils # for telnet/ftp/etc
+wafw00f
+medusa
+macchanger
+proxychains-ng
+socat
+tmux
+zmap
+
 # Note: Many tools are in BlackArch repo, added via script
+
