@@ -1,42 +1,54 @@
 #!/bin/bash
 
-# ShadowArch Auto-Builder
-# This script handles the End-to-End process:
-# 1. Checks if running on persistent disk.
-# 2. If not, runs setup_workspace.sh to migrate.
-# 3. Reloads itself from the new location to continue the build.
+# ShadowArch Auto-Builder (FIXED)
+# This script handles:
+# 1. Migrating to persistent disk (/mnt/build_workspace).
+# 2. Redirecting Pacman Cache to disk (Saves RAM).
+# 3. Building the ISO.
 
 set -e # Exit on error
 
 WORKSPACE_DIR="/mnt/build_workspace"
 CURRENT_DIR=$(pwd)
+PACMAN_CACHE_DIR="$WORKSPACE_DIR/pacman_cache"
+ORIGINAL_CACHE="/var/cache/pacman/pkg"
 
 echo "========================================"
-echo "    ShadowArch Master Builder"
+echo "    ShadowArch Master Builder (Fixed)"
 echo "========================================"
 
-# --- Phase 1: Environment Check ---
+# --- Phase 1: Environment Check & Handover ---
 if [[ "$CURRENT_DIR" != "$WORKSPACE_DIR" ]]; then
-    echo "[!] Not running from persistent workspace ($WORKSPACE_DIR)."
-    echo "[*] Initializing Workspace Setup..."
+    echo "[!] Not in Workspace. Checking if setup is needed..."
     
-    chmod +x setup_workspace.sh
-    ./setup_workspace.sh
+    # Run setup if workspace doesn't look ready
+    if [ ! -d "$WORKSPACE_DIR" ]; then
+        echo "[*] Initializing Workspace Setup..."
+        chmod +x setup_workspace.sh
+        ./setup_workspace.sh
+    fi
     
-    echo "----------------------------------------"
-    echo "[*] Workspace Ready. Transferring control to persistent storage..."
-    echo "----------------------------------------"
-    
-    # Handover control to the script on the hard drive
+    echo "[->] Transferring to Persistent Storage..."
     cd "$WORKSPACE_DIR"
     exec ./build.sh
 fi
 
 # --- Phase 2: Build Process (Runs on Hard Drive) ---
-echo "[+] Running from Persistent Storage. Starting Build..."
+echo "[+] Running from Persistent Storage ($WORKSPACE_DIR)."
+
+# CRITICAL FIX: Redirect Pacman Cache to Disk
+echo "[*] Setting up Persistent Pacman Cache..."
+mkdir -p "$PACMAN_CACHE_DIR"
+# Unmount if already mounted to avoid stacking
+if mountPOINT=$(mount | grep "$ORIGINAL_CACHE"); then
+    umount "$ORIGINAL_CACHE"
+fi
+# Bind mount
+mount --bind "$PACMAN_CACHE_DIR" "$ORIGINAL_CACHE"
+echo "[+] Cache directed to: $PACMAN_CACHE_DIR"
 
 # 1. Preparation
-echo "--> Step 1: Downloading Assets (prepare_iso.sh)..."
+echo "--> Step 1: Downloading Assets..."
 chmod +x prepare_iso.sh
 ./prepare_iso.sh
 
@@ -47,8 +59,13 @@ if [ -d "work" ]; then
 fi
 
 # 3. Build
-echo "--> Step 2: Building ISO (mkarchiso)..."
-mkarchiso -v -w work -o out .
+echo "--> Step 2: Building ISO..."
+# We explicitly force the work directory to be on the mounted disk
+mkarchiso -v -w "$WORKSPACE_DIR/work" -o "$WORKSPACE_DIR/out" .
+
+# Cleanup Hook
+echo "--> Cleaning up Cache Mount..."
+umount "$ORIGINAL_CACHE"
 
 echo "========================================"
 echo "    BUILD COMPLETE!"
