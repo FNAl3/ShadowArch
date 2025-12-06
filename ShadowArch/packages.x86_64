@@ -22,8 +22,6 @@ gpm
 gptfdisk
 grub
 hdparm
-ipw2100-fw
-ipw2200-fw
 iw
 iwd
 jfsutils
@@ -62,7 +60,6 @@ pptpclient
 python
 python-yaml
 reflector
-reiserfsprogs
 rp-pppoe
 rsync
 sdparm
@@ -108,7 +105,6 @@ qt5ct
 nmap
 wireshark-qt
 tcpdump
-gnu-netcat
 aircrack-ng
 john
 hashcat
@@ -127,10 +123,9 @@ nikto
 exploitdb
 masscan
 responder
-thc-hydra
 whois
-bind # for dig/nslookup
-inetutils # for telnet/ftp/etc
+bind
+inetutils
 wafw00f
 medusa
 macchanger
