@@ -33,7 +33,25 @@ Here is what each file/folder does:
 
 ---
 
-## 🛠️ How to Build (Create the ISO)
+## � Disk Partition Structure
+
+The `install_script.py` automatically handles disk partitioning. It enforces a **UEFI/GPT** layout:
+
+| Partition | Filesystem | Size | Description |
+| :--- | :--- | :--- | :--- |
+| **ESP** (EFI) | FAT32 | 512 MB | Bootloader (GRUB) and EFI executables. |
+| **Swap** | Swap | 4 GB | Virtual memory. |
+| **Root** (/) | EXT4 | **40%** | System binaries, /usr, /opt. |
+| **Var** (/var) | EXT4 | **15%** | Logs, Pacman Cache, Databases. |
+| **Tmp** (/tmp) | EXT4 | **5%** | Temporary files. |
+| **Home** (/home) | EXT4 | Remainder | User data (~40%). |
+
+> [!WARNING]
+> The installer **wipes the entire target disk**. It does not support dual-boot or manual partitioning in this version.
+
+---
+
+## �🛠️ How to Build (Create the ISO)
 
 To create your own ISO file to burn onto a USB, follow these steps on an Arch Linux system:
 

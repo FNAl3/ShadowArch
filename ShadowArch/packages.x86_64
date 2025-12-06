@@ -124,7 +124,7 @@ ffuf
 nikto
 exploitdb
 masscan
-responder
+
 whois
 bind
 inetutils

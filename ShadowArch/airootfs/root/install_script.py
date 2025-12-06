@@ -21,44 +21,97 @@ def load_config(config_path):
         return yaml.safe_load(f)
 
 def partition_disk(disk):
-    logging.info(f"Partitioning {disk}...")
-    # Wipe disk
-    run_command(f"wipefs -a {disk}")
+    print(f"\n--- Partitioning {disk} ---")
+    print("1) Automatic (Erase Disk + Advanced Layout)")
+    print("   [EFI: 512MB | SWAP: 4GB | ROOT: 40% | VAR: 15% | TMP: 5% | HOME: Rest (40%)]")
+    print("2) Manual (cfdisk)")
     
-    # Create GPT partition table
-    run_command(f"parted -s {disk} mklabel gpt")
+    choice = input("Select option [1]: ").strip()
     
-    # Create EFI partition (512MB)
-    run_command(f"parted -s {disk} mkpart ESP fat32 1MiB 513MiB")
-    run_command(f"parted -s {disk} set 1 boot on")
-    
-    # Create Root partition (Rest)
-    run_command(f"parted -s {disk} mkpart primary ext4 513MiB 100%")
-
-def format_partitions(disk):
-    logging.info("Formatting partitions...")
-    # Assuming standard naming convention (might vary for nvme)
-    p1 = f"{disk}1"
-    p2 = f"{disk}2"
-    if "nvme" in disk:
-        p1 = f"{disk}p1"
-        p2 = f"{disk}p2"
+    if choice == '2':
+        # Manual Mode
+        run_command(f"cfdisk {disk}", check=False)
+        print("\nPlease enter the partition paths you created (Leave empty if not created):")
+        efi_part = input("EFI Partition (e.g. /dev/sda1) [Required]: ").strip()
+        root_part = input("ROOT Partition (e.g. /dev/sda3) [Required]: ").strip()
+        swap_part = input("SWAP Partition (e.g. /dev/sda2): ").strip()
+        var_part = input("VAR Partition (e.g. /dev/sda4): ").strip()
+        tmp_part = input("TMP Partition (e.g. /dev/sda5): ").strip()
+        home_part = input("HOME Partition (e.g. /dev/sda6): ").strip()
         
-    run_command(f"mkfs.fat -F32 {p1}")
-    run_command(f"mkfs.ext4 -F {p2}")
-    
-    return p1, p2
+        if not efi_part or not root_part:
+            logging.error("EFI and Root partitions are required!")
+            sys.exit(1)
+            
+        return efi_part, swap_part, root_part, var_part, tmp_part, home_part
+    else:
+        # Automatic Mode
+        logging.info("Wiping and partitioning automatically...")
+        run_command(f"wipefs -a {disk}")
+        run_command(f"parted -s {disk} mklabel gpt")
+        
+        # 1. EFI (512MB)
+        run_command(f"parted -s {disk} mkpart ESP fat32 1MiB 513MiB")
+        run_command(f"parted -s {disk} set 1 boot on")
+        
+        # 2. SWAP (4GB) -> 513 + 4096 = 4609
+        run_command(f"parted -s {disk} mkpart primary linux-swap 513MiB 4609MiB")
+        
+        # 3. ROOT (Until 40%)
+        run_command(f"parted -s {disk} mkpart primary ext4 4609MiB 40%")
+        
+        # 4. VAR (40% -> 55%)
+        run_command(f"parted -s {disk} mkpart primary ext4 40% 55%")
 
-def mount_partitions(root_part, efi_part):
+        # 5. TMP (55% -> 60%)
+        run_command(f"parted -s {disk} mkpart primary ext4 55% 60%")
+
+        # 6. HOME (60% -> 100%)
+        run_command(f"parted -s {disk} mkpart primary ext4 60% 100%")
+        
+        # Determine names
+        p_prefix = f"{disk}p" if "nvme" in disk else f"{disk}"
+        return f"{p_prefix}1", f"{p_prefix}2", f"{p_prefix}3", f"{p_prefix}4", f"{p_prefix}5", f"{p_prefix}6"
+
+def format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part):
+    logging.info("Formatting partitions...")
+    
+    run_command(f"mkfs.fat -F32 {efi_part}")
+    run_command(f"mkfs.ext4 -F {root_part}")
+    
+    if swap_part: run_command(f"mkswap {swap_part}")
+    if var_part:  run_command(f"mkfs.ext4 -F {var_part}")
+    if tmp_part:  run_command(f"mkfs.ext4 -F {tmp_part}")
+    if home_part: run_command(f"mkfs.ext4 -F {home_part}")
+
+def mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_part):
     logging.info("Mounting partitions...")
+    # Mount Root first
     run_command(f"mount {root_part} /mnt")
+    
+    # Create mountpoints
     run_command(f"mkdir -p /mnt/boot")
     run_command(f"mount {efi_part} /mnt/boot")
+    
+    if var_part:
+        run_command(f"mkdir -p /mnt/var")
+        run_command(f"mount {var_part} /mnt/var")
+        
+    if tmp_part:
+        run_command(f"mkdir -p /mnt/tmp")
+        run_command(f"mount {tmp_part} /mnt/tmp")
+        
+    if home_part:
+        run_command(f"mkdir -p /mnt/home")
+        run_command(f"mount {home_part} /mnt/home")
+    
+    if swap_part:
+        run_command(f"swapon {swap_part}")
 
 def install_base(packages):
     logging.info("Installing base system...")
     pkg_list = " ".join(packages)
-    run_command(f"pacstrap -c /mnt base linux linux-firmware {pkg_list}")
+    run_command(f"pacstrap /mnt base linux linux-firmware {pkg_list}")
 
 def generate_fstab():
     logging.info("Generating fstab...")
@@ -132,7 +185,7 @@ cd ..
 rm -rf yay
 
 echo "Installing Security Tools from AUR..."
-yay -S --noconfirm metasploit dnsenum wafw00f sysreptor
+yay -S --noconfirm metasploit dnsenum wafw00f sysreptor responder
 EOF
 
 # Enable services
@@ -186,9 +239,9 @@ def main():
         sys.exit(1)
     
     disk = config.get('disk')
-    partition_disk(disk)
-    efi_part, root_part = format_partitions(disk)
-    mount_partitions(root_part, efi_part)
+    efi_part, swap_part, root_part, var_part, tmp_part, home_part = partition_disk(disk)
+    format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part)
+    mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_part)
     
     packages = config.get('packages', [])
     # Add essential packages if not present
@@ -197,7 +250,20 @@ def main():
         if p not in packages:
             packages.append(p)
             
-    install_base(packages)
+            packages.append(p)
+    
+    # Bind mount pacman cache to target disk to save RAM
+    logging.info("Binding pacman cache to target disk...")
+    run_command("mkdir -p /mnt/var/cache/pacman/pkg")
+    run_command("mkdir -p /var/cache/pacman/pkg")
+    run_command("mount --bind /mnt/var/cache/pacman/pkg /var/cache/pacman/pkg")
+
+    try:
+        install_base(packages)
+    finally:
+        # Ensure we unmount even if install fails
+        run_command("umount /var/cache/pacman/pkg")
+
     generate_fstab()
     configure_system(config)
 
