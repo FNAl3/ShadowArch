@@ -10,6 +10,7 @@ darkhttpd
 ddrescue
 dhcpcd
 diffutils
+git
 dosfstools
 e2fsprogs
 ethtool
@@ -110,12 +111,12 @@ hashcat
 testdisk
 ddrescue
 # Kali-Like Essentials
-metasploit
+
 hydra
 sqlmap
 bettercap
 ettercap
-dnsenum
+
 gobuster
 ffuf
 nikto
@@ -125,7 +126,7 @@ responder
 whois
 bind
 inetutils
-wafw00f
+
 medusa
 macchanger
 proxychains-ng

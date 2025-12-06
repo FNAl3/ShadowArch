@@ -118,6 +118,23 @@ pacman -S --noconfirm grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
+# AUR Tools Installation (Kali-like features)
+echo "Installing AUR tools..."
+pacman -S --noconfirm git base-devel
+
+# Switch to user to build and install yay and tools
+# We use a heredoc passed to su for complex commands
+su - {username} <<EOF
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si --noconfirm
+cd ..
+rm -rf yay
+
+echo "Installing Security Tools from AUR..."
+yay -S --noconfirm metasploit dnsenum wafw00f
+EOF
+
 # Enable services
 systemctl enable NetworkManager
 systemctl enable sddm
