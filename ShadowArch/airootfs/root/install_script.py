@@ -132,7 +132,7 @@ cd ..
 rm -rf yay
 
 echo "Installing Security Tools from AUR..."
-yay -S --noconfirm metasploit dnsenum wafw00f
+yay -S --noconfirm metasploit dnsenum wafw00f sysreptor
 EOF
 
 # Enable services
