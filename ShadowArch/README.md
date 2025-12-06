@@ -45,44 +45,6 @@ The `install_script.py` automatically handles disk partitioning. It enforces a *
 | **Var** (/var) | EXT4 | **15%** | Logs, Pacman Cache, Databases. |
 | **Tmp** (/tmp) | EXT4 | **5%** | Temporary files. |
 | **Home** (/home) | EXT4 | Remainder | User data (~40%). |
-
-> [!WARNING]
-> The installer **wipes the entire target disk**. It does not support dual-boot or manual partitioning in this version.
-
----
-
-## �🛠️ How to Build (Create the ISO)
-
-To create your own ISO file to burn onto a USB, follow these steps on an Arch Linux system:
-
-### 1. Prepare the Environment
-Ensure you have the necessary tools installed (archiso, git, curl, unzip):
-```bash
-sudo pacman -S archiso git curl unzip
-```
-
-### 2. Prepare Assets
-Run the helper script to download the Theme and PenTools:
-```bash
-chmod +x prepare_iso.sh
-./prepare_iso.sh
-```
-*Successfully downloaded themes will be placed in `airootfs/usr/share/themes`.*
-
-### 3. Compile
-Build the ISO (this takes 10-20 minutes depending on your internet/CPU):
-```bash
-sudo mkarchiso -v -w /tmp/archiso-work -o out .
-```
-
-### 4. Locate ISO
-The final file will be in the `out/` directory.
-
----
-
-## 🧪 Deployment / Boot Scenarios
-
-### 🖥️ VirtualBox (Standard Testing)
 1. **Create VM**: New > Type: Linux > Version: Arch Linux (64-bit).
 2. **Resources**:
     *   **RAM**: Minimum 4GB (8GB Recommended).
