@@ -3,6 +3,7 @@ base-devel
 linux
 linux-firmware
 archinstall
+arch-install-scripts
 btrfs-progs
 clonezilla
 darkhttpd
