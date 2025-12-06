@@ -58,7 +58,7 @@ def mount_partitions(root_part, efi_part):
 def install_base(packages):
     logging.info("Installing base system...")
     pkg_list = " ".join(packages)
-    run_command(f"pacstrap /mnt base linux linux-firmware {pkg_list}")
+    run_command(f"pacstrap -c /mnt base linux linux-firmware {pkg_list}")
 
 def generate_fstab():
     logging.info("Generating fstab...")
