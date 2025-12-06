@@ -269,7 +269,7 @@ def main():
         if p not in packages:
             packages.append(p)
             
-            packages.append(p)
+
     
     # Bind mount pacman cache to target disk to save RAM
     logging.info("Binding pacman cache to target disk...")
