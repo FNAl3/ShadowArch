@@ -106,7 +106,6 @@ usb_modeswitch
 usbutils
 vi
 vim
-xf86-video-vmware
 virtualbox-guest-utils
 vpnc
 wireless-regdb
