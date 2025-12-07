@@ -216,7 +216,7 @@ def configure_system(config):
         run_command("cp /root/shadow_wizard.sh /mnt/usr/local/bin/shadow-wizard")
         run_command("chmod +x /mnt/usr/local/bin/shadow-wizard")
 
-    setup_script = f"""
+    setup_script = f"""\
 #!/bin/bash
 ln -sf /usr/share/zoneinfo/{timezone} /etc/localtime
 hwclock --systohc
@@ -283,7 +283,6 @@ SUBEOF
 else
     echo "WARNING: No internet connection detected. Skipping AUR tools installation."
 fi
-EOF
 
 # Enable services
 # Enable services
@@ -291,7 +290,6 @@ systemctl enable NetworkManager
 systemctl enable sddm
 systemctl enable sshd
 systemctl enable httpd
-
 """
     with open('/mnt/setup.sh', 'w') as f:
         f.write(setup_script)
