@@ -251,7 +251,7 @@ echo "root:{root_password}" | chpasswd
 # User creation
 useradd -m -G wheel -s /bin/bash {username}
 echo "{username}:{password}" | chpasswd
-echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
+echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Bootloader (GRUB)
 pacman -S --noconfirm grub efibootmgr
