@@ -70,6 +70,7 @@ xf86-input-libinput
 hwinfo
 ppp
 pptpclient
+pv
 python
 python-yaml
 reflector
