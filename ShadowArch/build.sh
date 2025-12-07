@@ -47,6 +47,14 @@ fi
 mount --bind "$PACMAN_CACHE_DIR" "$ORIGINAL_CACHE"
 echo "[+] Cache directed to: $PACMAN_CACHE_DIR"
 
+# 0. Optimize Mirrors (Fix for "Operation too slow" errors)
+echo "--> Optimization: Updating Mirrors for speed..."
+if ! command -v reflector &> /dev/null; then
+    echo "Reflector not found. Installing..."
+    pacman -Sy --noconfirm reflector
+fi
+reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist --download-timeout 5
+
 # 1. Preparation
 echo "--> Step 1: Downloading Assets..."
 chmod +x prepare_iso.sh
