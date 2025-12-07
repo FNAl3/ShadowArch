@@ -48,6 +48,7 @@ cp logo.png syslinux/splash.png
 # ln -sf /usr/lib/systemd/system/sddm.service airootfs/etc/systemd/system/display-manager.service
 
 # Enable NetworkManager (just in case)
+mkdir -p airootfs/etc/systemd/system/multi-user.target.wants
 ln -sf /usr/lib/systemd/system/NetworkManager.service airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
 
 # Set Default Target to Graphical (for SDDM) - DISABLED

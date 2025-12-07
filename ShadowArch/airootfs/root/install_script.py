@@ -4,9 +4,31 @@ import sys
 import yaml
 import subprocess
 import logging
+# Import utils if we were to separate files, but for now injecting methods directly or defining them here.
+# Since we cannot easily import a side file in this specific context without ensuring it's in path, 
+# I will inject the function definitions directly in the next step instead of using a separate file specific import here unless I merge them.
+# Let's actually define them in this file for simplicity as it runs standalone.
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def fix_host_keyring():
+    logging.info("Fixing host pacman keyring to prevent signature errors...")
+    try:
+        run_command("pacman-key --init", check=False)
+        run_command("pacman-key --populate archlinux", check=False)
+        run_command("pacman -Sy --noconfirm archlinux-keyring", check=False)
+    except Exception as e:
+        logging.warning(f"Keyring fix warning: {e}")
+
+def cleanup_previous_mounts():
+    logging.info("Checking for leftover mounts from previous runs...")
+    try:
+        run_command("umount -R /mnt", check=False)
+        run_command("swapoff -a", check=False)
+    except:
+        pass
 
 def run_command(command, check=True):
     logging.info(f"Running: {command}")
@@ -337,6 +359,8 @@ def main():
     run_command("mount --bind /mnt/var/cache/pacman/pkg /var/cache/pacman/pkg")
 
     # Setup Mirrors before pacstrap
+    cleanup_previous_mounts()
+    fix_host_keyring()
     setup_mirrors()
 
     try:
