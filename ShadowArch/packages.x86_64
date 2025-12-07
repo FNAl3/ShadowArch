@@ -76,6 +76,9 @@ xf86-video-nouveau
 xf86-video-fbdev
 libva-mesa-driver
 mesa-vdpau
+nvidia
+nvidia-utils
+egl-wayland
 xf86-input-libinput
 hwinfo
 ppp
