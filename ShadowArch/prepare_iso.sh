@@ -43,15 +43,15 @@ mkdir -p grub syslinux
 cp logo.png grub/splash.png
 cp logo.png syslinux/splash.png
 
-# Enable SDDM (Display Manager)
-echo "Enabling SDDM..."
-ln -sf /usr/lib/systemd/system/sddm.service airootfs/etc/systemd/system/display-manager.service
+# Enable SDDM (Display Manager) - DISABLED FOR AUTOLOGIN FIX
+# echo "Enabling SDDM..."
+# ln -sf /usr/lib/systemd/system/sddm.service airootfs/etc/systemd/system/display-manager.service
 
 # Enable NetworkManager (just in case)
 ln -sf /usr/lib/systemd/system/NetworkManager.service airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
 
-# Set Default Target to Graphical (for SDDM)
-ln -sf /usr/lib/systemd/system/graphical.target airootfs/etc/systemd/system/default.target
+# Set Default Target to Graphical (for SDDM) - DISABLED
+# ln -sf /usr/lib/systemd/system/graphical.target airootfs/etc/systemd/system/default.target
 
 # Enable Reflector (Mirror Auto-Update)
 ln -sf /usr/lib/systemd/system/reflector.service airootfs/etc/systemd/system/multi-user.target.wants/reflector.service
