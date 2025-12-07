@@ -19,3 +19,6 @@ packages:
   - networkmanager
   - sudo
   - os-prober
+  - sddm
+  - openssh
+  - apache
