@@ -66,6 +66,12 @@ sof-firmware
 alsa-utils
 broadcom-wl-dkms
 r8168
+intel-ucode
+amd-ucode
+tlp
+bluez
+bluez-utils
+lm_sensors
 apache
 mesa
 vulkan-intel
