@@ -1,0 +1,21 @@
+disk: /dev/sda
+hostname: shadowarch
+username: user
+password: password
+root_password: root
+timezone: Europe/Madrid
+keymap: es
+locale: es_ES.UTF-8
+packages:
+  - git
+  - firefox
+  - htop
+  - fastfetch
+  - hyprland
+  - waybar
+  - wofi
+  - kitty
+  - vim
+  - networkmanager
+  - sudo
+  - os-prober

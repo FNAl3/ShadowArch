@@ -363,6 +363,14 @@ def main():
     fix_host_keyring()
     setup_mirrors()
 
+    # Filter out deprecated packages (neofetch -> fastfetch)
+    packages = [p if p != 'neofetch' else 'fastfetch' for p in packages]
+
+    # Pre-create config files needed by mkinitcpio hooks during pacstrap
+    logging.info("Pre-creating system configs for mkinitcpio hooks...")
+    run_command("mkdir -p /mnt/etc")
+    run_command(f"echo 'KEYMAP={config.get('keymap', 'us')}' > /mnt/etc/vconsole.conf")
+
     try:
         install_base(packages)
     finally:
