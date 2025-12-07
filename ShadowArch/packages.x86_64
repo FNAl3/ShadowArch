@@ -66,6 +66,16 @@ sof-firmware
 alsa-utils
 apache
 mesa
+vulkan-intel
+vulkan-radeon
+vulkan-swrast
+xf86-video-vmware
+xf86-video-amdgpu
+xf86-video-ati
+xf86-video-nouveau
+xf86-video-fbdev
+libva-mesa-driver
+mesa-vdpau
 xf86-input-libinput
 hwinfo
 ppp
