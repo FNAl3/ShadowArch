@@ -64,6 +64,8 @@ pipewire-alsa
 pipewire-pulse
 sof-firmware
 alsa-utils
+broadcom-wl-dkms
+r8168
 apache
 mesa
 vulkan-intel

@@ -188,6 +188,12 @@ def configure_system(config):
     
     # Write configuration script to be run inside chroot
 
+    # Deploy Post-Install Wizard
+    logging.info("Deploying Shadow Wizard...")
+    if os.path.exists("/root/shadow_wizard.sh"):
+        run_command("cp /root/shadow_wizard.sh /mnt/usr/local/bin/shadow-wizard")
+        run_command("chmod +x /mnt/usr/local/bin/shadow-wizard")
+
     setup_script = f"""
 #!/bin/bash
 ln -sf /usr/share/zoneinfo/{timezone} /etc/localtime
