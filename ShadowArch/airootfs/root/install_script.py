@@ -185,6 +185,16 @@ echo "LANG={locale}" > /etc/locale.conf
 echo "KEYMAP={keymap}" > /etc/vconsole.conf
 echo "{hostname}" > /etc/hostname
 
+# Configure mkinitcpio (Standard hooks for installed system)
+# We add autodetect here for performance on the target machine
+cat <<EOF > /etc/mkinitcpio.conf
+MODULES=()
+BINARIES=()
+FILES=()
+HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)
+EOF
+
+
 # Initialize Pacman Keys
 echo "Initializing Pacman Keys..."
 pacman-key --init

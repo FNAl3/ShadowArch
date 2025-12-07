@@ -61,7 +61,8 @@ fi
 # 3. Build
 echo "--> Step 2: Building ISO..."
 # We explicitly force the work directory to be on the mounted disk
-mkarchiso -v -w "$WORKSPACE_DIR/work" -o "$WORKSPACE_DIR/out" .
+# Capturing output to log file
+mkarchiso -v -w "$WORKSPACE_DIR/work" -o "$WORKSPACE_DIR/out" . 2>&1 | tee "$WORKSPACE_DIR/build_log.txt"
 
 # Cleanup Hook
 echo "--> Cleaning up Cache Mount..."

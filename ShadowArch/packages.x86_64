@@ -98,6 +98,7 @@ xl2tpd
 zsh
 # Hyprland & Desktop
 hyprland
+hyprpaper
 waybar
 wofi
 kitty
