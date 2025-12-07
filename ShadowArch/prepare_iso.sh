@@ -32,6 +32,30 @@ fi
 chmod +x "$PENTOOLS_DIR"/*.py 2>/dev/null
 chmod +x "$PENTOOLS_DIR"/*.sh 2>/dev/null
 
+# 3. Configure Boot Logo & Interface
+echo "=== Configuring Boot & Interface ==="
+# Ensure directories exist
+mkdir -p airootfs/etc/systemd/system/getty.target.wants
+mkdir -p airootfs/etc/systemd/system/
+mkdir -p grub syslinux
+
+# Copy Logo
+cp logo.png grub/splash.png
+cp logo.png syslinux/splash.png
+
+# Enable SDDM (Display Manager)
+echo "Enabling SDDM..."
+ln -sf /usr/lib/systemd/system/sddm.service airootfs/etc/systemd/system/display-manager.service
+
+# Enable NetworkManager (just in case)
+ln -sf /usr/lib/systemd/system/NetworkManager.service airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+
+# Set Default Target to Graphical (for SDDM)
+ln -sf /usr/lib/systemd/system/graphical.target airootfs/etc/systemd/system/default.target
+
+# Enable Reflector (Mirror Auto-Update)
+ln -sf /usr/lib/systemd/system/reflector.service airootfs/etc/systemd/system/multi-user.target.wants/reflector.service
+
 # Create a symlink in /usr/local/bin for easy access if desired
 # (Archiso handles permissions in profiledef.sh, but we can pre-create links if we want)
 

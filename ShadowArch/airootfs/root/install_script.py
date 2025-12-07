@@ -17,6 +17,19 @@ def run_command(command, check=True):
         if check:
             sys.exit(1)
 
+def setup_mirrors():
+    logging.info("Setting up mirrors...")
+    if check_internet():
+        logging.info("Internet detected. Updating mirrorlist with Reflector...")
+        # Update mirrors: latest 20, https, sort by rate
+        try:
+            run_command("reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist --download-timeout 5", check=True)
+            run_command("pacman -Sy", check=False) # Sync databases
+        except:
+             logging.warning("Reflector failed. Falling back to existing mirrorlist.")
+    else:
+        logging.warning("No internet. Skipping mirror update. Installation may fail if mirrors are invalid.")
+
 def check_internet():
     try:
         # Check connection to Google DNS
@@ -316,6 +329,9 @@ def main():
     run_command("mkdir -p /mnt/var/cache/pacman/pkg")
     run_command("mkdir -p /var/cache/pacman/pkg")
     run_command("mount --bind /mnt/var/cache/pacman/pkg /var/cache/pacman/pkg")
+
+    # Setup Mirrors before pacstrap
+    setup_mirrors()
 
     try:
         install_base(packages)
