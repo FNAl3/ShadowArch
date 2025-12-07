@@ -35,3 +35,18 @@ packages:
   - nvidia-utils
   - egl-wayland
   - virtualbox-guest-utils
+  # Essential Audio & UI
+  - pipewire
+  - pipewire-alsa
+  - pipewire-pulse
+  - wireplumber
+  - ttf-jetbrains-mono
+  - ttf-font-awesome
+  - otf-font-awesome
+  - nwg-look
+  - qt5ct
+  - papirus-icon-theme
+  - dunst
+  - polkit-kde-agent
+  - thunar
+  - thunar-archive-plugin
