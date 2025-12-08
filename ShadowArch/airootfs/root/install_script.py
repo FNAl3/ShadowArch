@@ -87,7 +87,7 @@ def partition_disk(disk):
             logging.error("EFI and Root partitions are required!")
             sys.exit(1)
             
-        return False, efi_part, swap_part, root_part, var_part, tmp_part, home_part
+        return efi_part, swap_part, root_part, var_part, tmp_part, home_part
     else:
         # Automatic Mode
         logging.info("Wiping and partitioning automatically...")
@@ -115,30 +115,13 @@ def partition_disk(disk):
         
         # Determine names
         p_prefix = f"{disk}p" if "nvme" in disk else f"{disk}"
-        return True, f"{p_prefix}1", f"{p_prefix}2", f"{p_prefix}3", f"{p_prefix}4", f"{p_prefix}5", f"{p_prefix}6"
+        return f"{p_prefix}1", f"{p_prefix}2", f"{p_prefix}3", f"{p_prefix}4", f"{p_prefix}5", f"{p_prefix}6"
 
-def format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part, auto_mode=True):
+def format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part):
     logging.info("Formatting partitions...")
     
-    # Check if we should format Root (Critical if running from Disk)
-    format_root = True
-    if not auto_mode:
-        if not confirm_action(f"Format ROOT partition {root_part}? (WARNING: This destroys data)"):
-            format_root = False
-            logging.info(f"Skipping formatting of {root_part} (User Request).")
-
-    if format_root:
-        run_command(f"mkfs.ext4 -F {root_part}")
-    
-    # Always format EFI if requested? Usually yes, but maybe ask? 
-    # Let's assume EFI should be clean or is distinct. 
-    # Safest to ask for EFI too if manual? usually EFI is shared.
-    if not auto_mode:
-         if confirm_action(f"Format EFI partition {efi_part}?"):
-             run_command(f"mkfs.fat -F32 {efi_part}")
-    else:
-         run_command(f"mkfs.fat -F32 {efi_part}")
-
+    run_command(f"mkfs.fat -F32 {efi_part}")
+    run_command(f"mkfs.ext4 -F {root_part}")
     
     if swap_part: run_command(f"mkswap {swap_part}")
     if var_part:  run_command(f"mkfs.ext4 -F {var_part}")
@@ -209,37 +192,58 @@ def configure_system(config):
     
     keymap = config.get('keymap', 'us')
     
-    # PATH RESOLUTION FOR GIT INSTALLER
-    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    # Assuming script is in airootfs/root/, parent is airootfs
-    AIROOTFS_DIR = os.path.dirname(SCRIPT_DIR) 
+    # PATH RESOLUTION
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # airootfs/root/
+    REPO_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR)) # ShadowArch/
 
-    # Copy custom dotfiles (skel) from Repo to Target System
+    # 1. Copy Dotfiles (Skel) - Lightweight, keep local
     logging.info("Copying custom dotfiles...")
-    skel_source = os.path.join(AIROOTFS_DIR, 'etc', 'skel')
+    skel_source = os.path.join(os.path.dirname(SCRIPT_DIR), 'etc', 'skel') # airootfs/etc/skel
     if os.path.exists(skel_source):
         run_command(f"cp -r {skel_source}/. /mnt/etc/skel/")
-    else:
-        logging.warning(f"Skel directory not found at {skel_source}")
+        run_command(f"cp -r {skel_source}/. /mnt/root/") # Also for root
     
-    # Copy custom themes and backgrounds
-    logging.info("Copying custom themes and assets...")
+    # 2. Setup Directories
     run_command("mkdir -p /mnt/usr/share/themes")
     run_command("mkdir -p /mnt/usr/share/backgrounds")
-    
-    # Dracula Theme
-    dracula_source = os.path.join(AIROOTFS_DIR, 'usr', 'share', 'themes', 'Dracula')
-    if os.path.exists(dracula_source):
-        run_command(f"cp -r {dracula_source} /mnt/usr/share/themes/")
-    else:
-        logging.warning("Dracula theme not found in repo. Did you run prepare_iso.sh? Skipping.")
+    run_command("mkdir -p /mnt/opt/PenTools")
 
-    # Wallpapers
-    bg_source = os.path.join(AIROOTFS_DIR, 'usr', 'share', 'backgrounds', 'shadowk.png') 
-    if os.path.exists(bg_source):
-        run_command(f"cp {bg_source} /mnt/usr/share/backgrounds/")
+    # 3. Download Assets (Direct to Disk to save RAM)
+    logging.info("Downloading Assets directly to Target Disk...")
+    
+    # Theme: Dracula
+    if check_internet():
+        logging.info("Downloading Dracula Theme...")
+        try:
+             # Download zip to /mnt/tmp to avoid RAM
+             run_command("mkdir -p /mnt/tmp_dl")
+             run_command("curl -L -o /mnt/tmp_dl/theme.zip https://github.com/dracula/gtk/archive/master.zip", check=False)
+             run_command("unzip -o /mnt/tmp_dl/theme.zip -d /mnt/usr/share/themes", check=False)
+             run_command("mv /mnt/usr/share/themes/gtk-master /mnt/usr/share/themes/Dracula", check=False)
+             run_command("rm -rf /mnt/tmp_dl")
+        except:
+             logging.warning("Failed to download theme.")
+
+        logging.info("Cloning PenTools...")
+        try:
+            run_command("git clone --depth 1 https://github.com/FNAl3/PenTools /mnt/opt/PenTools", check=False)
+            run_command("chmod +x /mnt/opt/PenTools/*.py", check=False)
+            run_command("chmod +x /mnt/opt/PenTools/*.sh", check=False)
+        except:
+            logging.warning("Failed to clone PenTools.")
     else:
-         logging.warning("Wallpaper shadowk.png not found.")
+        logging.warning("No internet. Skipping asset downloads.")
+
+    # 4. Wallpaper (Local in Repo)
+    # logo.png is in REPO_ROOT/logo.png
+    logo_path = os.path.join(REPO_ROOT, "logo.png")
+    if os.path.exists(logo_path):
+        run_command(f"cp {logo_path} /mnt/usr/share/backgrounds/shadowk.png")
+    else:
+         # Fallback to looking in airootfs if prepare_assets ran (backwards compat)
+         bg_source = os.path.join(os.path.dirname(SCRIPT_DIR), 'usr', 'share', 'backgrounds', 'shadowk.png')
+         if os.path.exists(bg_source):
+            run_command(f"cp {bg_source} /mnt/usr/share/backgrounds/shadowk.png")
 
     # Reverted SDDM copy per user request
 
@@ -374,8 +378,8 @@ def main():
         sys.exit(1)
     
     disk = config.get('disk')
-    is_auto, efi_part, swap_part, root_part, var_part, tmp_part, home_part = partition_disk(disk)
-    format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part, auto_mode=is_auto)
+    efi_part, swap_part, root_part, var_part, tmp_part, home_part = partition_disk(disk)
+    format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part)
     mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_part)
     
     packages = config.get('packages', [])

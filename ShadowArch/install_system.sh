@@ -19,12 +19,10 @@ else
     echo "    Dependencies met."
 fi
 
-# 2. Prepare Assets (Download Themes, etc.)
-echo "[*] Preparing Assets (running prepare_assets.sh)..."
-chmod +x prepare_assets.sh
-./prepare_assets.sh
+    echo "    Dependencies met."
+fi
 
-# 3. Launch Installer
+# 2. Launch Installer
 echo "[*] Launching Installation Script..."
 echo "    Config: airootfs/root/config.yaml"
 echo "========================================"
