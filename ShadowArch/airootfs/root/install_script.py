@@ -17,13 +17,7 @@ def fix_host_keyring():
     except Exception as e:
         logging.warning(f"Keyring fix warning: {e}")
 
-def cleanup_previous_mounts():
-    logging.info("Checking for leftover mounts from previous runs...")
-    try:
-        run_command("umount -R /mnt", check=False)
-        run_command("swapoff -a", check=False)
-    except:
-        pass
+
 
 def run_command(command, check=True):
     logging.info(f"Running: {command}")

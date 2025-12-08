@@ -1,13 +1,12 @@
 #!/bin/bash
 
 # ShadowArch Git Installer Wrapper
-# This script prepares the environment and runs the installer
-# directly from the cloned repository.
+# This script prepares the environment and runs the installer.
 
 set -e
 
 echo "========================================"
-echo "    ShadowArch Git Installer"
+echo "    ShadowArch Installer Wrapper"
 echo "========================================"
 
 # 1. Install Dependencies (Python & YAML)
@@ -21,12 +20,12 @@ fi
 
 # 2. Launch Installer
 echo "[*] Launching Installation Script..."
-echo "    Config: airootfs/root/config.yaml"
+echo "    Config: config.yaml"
 echo "========================================"
 
 chmod +x airootfs/root/install_script.py
 python airootfs/root/install_script.py airootfs/root/config.yaml
 
 echo "========================================"
-echo "    Wrappper Finished."
+echo "    Wrapper Finished."
 echo "========================================"
