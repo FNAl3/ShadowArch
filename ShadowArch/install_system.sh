@@ -19,8 +19,6 @@ else
     echo "    Dependencies met."
 fi
 
-
-
 # 2. Launch Installer
 echo "[*] Launching Installation Script..."
 echo "    Config: airootfs/root/config.yaml"

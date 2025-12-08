@@ -1,47 +1,58 @@
-# ShadowArch
+# ShadowArch 🚀
 
-ShadowArch is a **Custom Arch Linux Deployment Framework**.
-It allows you to rapidly deploy a fully configured Arch Linux system (Hyprland, Pentesting Tools, Theming) using a simple Git-based workflow.
+**ShadowArch** is a simplified, Git-based installer for Arch Linux.
+It deploys a fully configured system (Hyprland, Waybar, Pentesting Tools, Dracula Theme) directly from the official Arch Linux ISO.
 
-## 🚀 Installation
+---
 
-You do NOT need to download a custom ISO. You can install ShadowArch directly from the official Arch Linux installation media.
+## 📥 Installation
 
-### 1. Boot Arch Linux
-Download the official [Arch Linux ISO](https://archlinux.org/download/), flash it to a USB, and boot it.
+**Prerequisites:**
+- Official [Arch Linux ISO](https://archlinux.org/download/) (flashed to USB).
+- Functional Internet Connection.
 
-### 2. Clone & Run
-Connect to the internet, then run the following commands:
+### Step 1: Boot & Prepare
+Boot into the Arch Linux Live ISO. Connect to Wi-Fi (`iwctl`) or Ethernet.
+
+### Step 2: Clone & Run
+Run the following commands strictly in order:
 
 ```bash
-# 1. Install Git
+# 1. Update pkglist and install Git
 pacman -Sy --noconfirm git
 
-# 2. Clone Repo
+# 2. Clone the Repository
 git clone https://github.com/FNAl3/ShadowArch.git
-cd ShadowArch
 
-# 3. Launch Installer
+# 3. Enter directory and Run
+cd ShadowArch
 chmod +x install_system.sh
 ./install_system.sh
 ```
 
-The script will automatically:
-- Download dependencies (python, yaml).
-- **Download Assets Directly to Disk** (saves RAM).
-- Launch the guided installer.
+### Step 3: Interactive Setup
+The script will launch and ask you for:
+1.  **Hostname, User, Password**: Confirm or edit defaults.
+2.  **Target Disk**: Select your drive (e.g., `/dev/sda`).
+3.  **Partitioning Mode**:
+    - **1) Automatic**: Warning! This **ERASES THE WHOLE DISK**. It creates a standardized Partition Layout (EFI, Swap, Root, Home). **Recommended**.
+    - **2) Manual**: Launches `cfdisk` for custom layouts.
 
-## ⚙️ Configuration
-The installation is driven by `airootfs/root/config.yaml`. You can edit this file before running the script to customize:
-- **Packages**: Add/remove tools.
-- **Users**: Set username/passwords.
-- **Disk**: Select target drive (`/dev/sda`, `/dev/nvme0n1`).
+---
 
-## 🎨 Features
-- **Desktop**: Hyprland (Wayland) + Waybar + Wofi.
-- **Theme**: Dracula GTK + Custom Wallpaper.
-- **Tools**: Pre-configured security tools (Metasploit, Nmap, etc.) via AUR.
-- **Audio**: Pipewire setup out-of-the-box.
+## 🎨 What you get
+*   **Base System**: Arch Linux Kernel, Firmware, Base-devel.
+*   **Desktop**: Hyprland (Wayland), Waybar, Wofi, Kitty.
+*   **Theming**: Dracula GTK Theme, Custom Wallpapers, Icons.
+*   **Tools**: Metasploit, Nmap, BurpSuite (via AUR/PenTools) - *Downloading directly to disk*.
+*   **Audio**: Pipewire + Wireplumber.
 
-## 🛠️ Development
-To modify the installer, edit `airootfs/root/install_script.py`.
+## ⚙️ Customization
+Before running the script, you can edit `airootfs/root/config.yaml` to change:
+*   Default Package List.
+*   Username / Passwords.
+*   Timezone / Locale.
+
+## ⚠️ Troubleshooting
+*   **"No space left on device"**: This is fixed. The script now downloads generic assets directly to your target partition, bypassing RAM limits.
+*   **"Signature errors"**: The script automatically refreshes Arch Keyrings before starting.

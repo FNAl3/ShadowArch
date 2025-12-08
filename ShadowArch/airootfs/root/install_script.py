@@ -4,11 +4,6 @@ import sys
 import yaml
 import subprocess
 import logging
-# Import utils if we were to separate files, but for now injecting methods directly or defining them here.
-# Since we cannot easily import a side file in this specific context without ensuring it's in path, 
-# I will inject the function definitions directly in the next step instead of using a separate file specific import here unless I merge them.
-# Let's actually define them in this file for simplicity as it runs standalone.
-
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -235,7 +230,6 @@ def configure_system(config):
         logging.warning("No internet. Skipping asset downloads.")
 
     # 4. Wallpaper (Local in Repo)
-    # logo.png is in REPO_ROOT/logo.png
     logo_path = os.path.join(REPO_ROOT, "logo.png")
     if os.path.exists(logo_path):
         run_command(f"cp {logo_path} /mnt/usr/share/backgrounds/shadowk.png")
@@ -244,8 +238,6 @@ def configure_system(config):
          bg_source = os.path.join(os.path.dirname(SCRIPT_DIR), 'usr', 'share', 'backgrounds', 'shadowk.png')
          if os.path.exists(bg_source):
             run_command(f"cp {bg_source} /mnt/usr/share/backgrounds/shadowk.png")
-
-    # Reverted SDDM copy per user request
 
     # Deploy Post-Install Wizard
     logging.info("Deploying Shadow Wizard...")
@@ -267,8 +259,7 @@ echo "LANG={locale}" > /etc/locale.conf
 echo "KEYMAP={keymap}" > /etc/vconsole.conf
 echo "{hostname}" > /etc/hostname
 
-# Configure mkinitcpio (Standard hooks for installed system)
-# We add autodetect here for performance on the target machine
+# Configure mkinitcpio
 cat <<EOF > /etc/mkinitcpio.conf
 MODULES=()
 BINARIES=()
@@ -276,16 +267,13 @@ FILES=()
 HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)
 EOF
 
-
 # Initialize Pacman Keys
 echo "Initializing Pacman Keys..."
 pacman-key --init
 pacman-key --populate archlinux
 pacman -Sy --noconfirm archlinux-keyring
 
-
 # Root password
-
 echo "root:{root_password}" | chpasswd
 
 # User creation
@@ -299,14 +287,10 @@ mkinitcpio -P
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
-# AUR Tools Installation (Kali-like features)
-# Only run if internet is available
+# AUR Tools Installation
 if ping -c 1 8.8.8.8 &> /dev/null; then
     echo "Internet detected. Installing AUR tools..."
     pacman -S --noconfirm git base-devel
-
-    # Switch to user to build and install yay and tools
-    # We use a heredoc passed to su for complex commands
     su - {username} <<SUBEOF
     if [ ! -d "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
@@ -314,18 +298,12 @@ if ping -c 1 8.8.8.8 &> /dev/null; then
         makepkg -si --noconfirm
         cd ..
         rm -rf yay
-    else
-        echo "yay already exists, skipping clone..."
     fi
-
     echo "Installing Security Tools from AUR..."
     yay -S --noconfirm metasploit dnsenum2 wafw00f responder ffuf
 SUBEOF
-else
-    echo "WARNING: No internet connection detected. Skipping AUR tools installation."
 fi
 
-# Enable services
 # Enable services
 systemctl enable NetworkManager
 systemctl enable sddm
@@ -359,7 +337,6 @@ def main():
         
     config = load_config(config_file)
     
-    # Interactive Configuration Overrides
     print("\n--- Interactive Configuration ---")
     config['hostname'] = get_input("Hostname", config.get('hostname', 'archlinux'))
     config['username'] = get_input("Username", config.get('username', 'user'))
@@ -383,29 +360,22 @@ def main():
     mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_part)
     
     packages = config.get('packages', [])
-    # Add essential packages if not present
     essentials = ['vim', 'networkmanager', 'sudo', 'os-prober']
     for p in essentials:
         if p not in packages:
             packages.append(p)
             
-
-    
-    # Bind mount pacman cache to target disk to save RAM
     logging.info("Binding pacman cache to target disk...")
     run_command("mkdir -p /mnt/var/cache/pacman/pkg")
     run_command("mkdir -p /var/cache/pacman/pkg")
     run_command("mount --bind /mnt/var/cache/pacman/pkg /var/cache/pacman/pkg")
 
-    # Setup Mirrors before pacstrap
-    cleanup_previous_mounts()
+
     fix_host_keyring()
     setup_mirrors()
 
-    # Filter out deprecated packages (neofetch -> fastfetch)
     packages = [p if p != 'neofetch' else 'fastfetch' for p in packages]
 
-    # Pre-create config files needed by mkinitcpio hooks during pacstrap
     logging.info("Pre-creating system configs for mkinitcpio hooks...")
     run_command("mkdir -p /mnt/etc")
     run_command(f"echo 'KEYMAP={config.get('keymap', 'us')}' > /mnt/etc/vconsole.conf")
@@ -413,12 +383,10 @@ def main():
     try:
         install_base(packages)
     finally:
-        # Ensure we unmount even if install fails
         run_command("umount /var/cache/pacman/pkg")
 
     generate_fstab()
     configure_system(config)
-
     
     logging.info("Installation complete! You can now reboot.")
 
