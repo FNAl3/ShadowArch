@@ -16,6 +16,14 @@ packages:
   - wofi
   - kitty
   - vim
+  - nano
+  - wget
+  - zip
+  - unzip
+  - man-db
+  - dosfstools
+  - ntfs-3g
+  - gvfs # For thunar mounting
   - networkmanager
   - sudo
   - os-prober
