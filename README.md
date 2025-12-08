@@ -56,3 +56,4 @@ Before running the script, you can edit `airootfs/root/config.yaml` to change:
 ## ⚠️ Troubleshooting
 *   **"No space left on device"**: This is fixed. The script now downloads generic assets directly to your target partition, bypassing RAM limits.
 *   **"Signature errors"**: The script automatically refreshes Arch Keyrings before starting.
+*   **VirtualBox Users**: Ensure **3D Acceleration** is ENABLED in your VM Display settings. Hyprland requires this to boot effectively.
