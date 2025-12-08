@@ -50,3 +50,4 @@ packages:
   - polkit-kde-agent
   - thunar
   - thunar-archive-plugin
+  - xdg-user-dirs # Standard folders (Downloads, etc)

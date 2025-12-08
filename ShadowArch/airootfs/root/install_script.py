@@ -299,6 +299,9 @@ if ping -c 1 8.8.8.8 &> /dev/null; then
         cd ..
         rm -rf yay
     fi
+    # Create standard directories (Desktop, Downloads, etc.)
+    xdg-user-dirs-update
+
     echo "Installing Security Tools from AUR..."
     yay -S --noconfirm metasploit dnsenum2 wafw00f responder ffuf
 SUBEOF
