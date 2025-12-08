@@ -87,7 +87,7 @@ def partition_disk(disk):
             logging.error("EFI and Root partitions are required!")
             sys.exit(1)
             
-        return efi_part, swap_part, root_part, var_part, tmp_part, home_part
+        return False, efi_part, swap_part, root_part, var_part, tmp_part, home_part
     else:
         # Automatic Mode
         logging.info("Wiping and partitioning automatically...")
@@ -115,13 +115,30 @@ def partition_disk(disk):
         
         # Determine names
         p_prefix = f"{disk}p" if "nvme" in disk else f"{disk}"
-        return f"{p_prefix}1", f"{p_prefix}2", f"{p_prefix}3", f"{p_prefix}4", f"{p_prefix}5", f"{p_prefix}6"
+        return True, f"{p_prefix}1", f"{p_prefix}2", f"{p_prefix}3", f"{p_prefix}4", f"{p_prefix}5", f"{p_prefix}6"
 
-def format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part):
+def format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part, auto_mode=True):
     logging.info("Formatting partitions...")
     
-    run_command(f"mkfs.fat -F32 {efi_part}")
-    run_command(f"mkfs.ext4 -F {root_part}")
+    # Check if we should format Root (Critical if running from Disk)
+    format_root = True
+    if not auto_mode:
+        if not confirm_action(f"Format ROOT partition {root_part}? (WARNING: This destroys data)"):
+            format_root = False
+            logging.info(f"Skipping formatting of {root_part} (User Request).")
+
+    if format_root:
+        run_command(f"mkfs.ext4 -F {root_part}")
+    
+    # Always format EFI if requested? Usually yes, but maybe ask? 
+    # Let's assume EFI should be clean or is distinct. 
+    # Safest to ask for EFI too if manual? usually EFI is shared.
+    if not auto_mode:
+         if confirm_action(f"Format EFI partition {efi_part}?"):
+             run_command(f"mkfs.fat -F32 {efi_part}")
+    else:
+         run_command(f"mkfs.fat -F32 {efi_part}")
+
     
     if swap_part: run_command(f"mkswap {swap_part}")
     if var_part:  run_command(f"mkfs.ext4 -F {var_part}")
@@ -357,8 +374,8 @@ def main():
         sys.exit(1)
     
     disk = config.get('disk')
-    efi_part, swap_part, root_part, var_part, tmp_part, home_part = partition_disk(disk)
-    format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part)
+    is_auto, efi_part, swap_part, root_part, var_part, tmp_part, home_part = partition_disk(disk)
+    format_partitions(efi_part, swap_part, root_part, var_part, tmp_part, home_part, auto_mode=is_auto)
     mount_partitions(root_part, efi_part, swap_part, var_part, tmp_part, home_part)
     
     packages = config.get('packages', [])
