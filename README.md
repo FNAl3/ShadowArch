@@ -11,15 +11,7 @@ You do NOT need to download a custom ISO. You can install ShadowArch directly fr
 Download the official [Arch Linux ISO](https://archlinux.org/download/), flash it to a USB, and boot it.
 
 ### 2. Clone & Run
-Connect to the internet.
-
-> **Tip**: To avoid running out of RAM (Live ISO limitation), mount your target disk to `/mnt` and clone the repo there.
-> ```bash
-> mount /dev/sda3 /mnt  # Replace with your partition
-> cd /mnt
-> ```
-
-Run the following commands:
+Connect to the internet, then run the following commands:
 
 ```bash
 # 1. Install Git
@@ -36,7 +28,7 @@ chmod +x install_system.sh
 
 The script will automatically:
 - Download dependencies (python, yaml).
-- Fetch assets (Dracula theme, Wallpapers).
+- **Download Assets Directly to Disk** (saves RAM).
 - Launch the guided installer.
 
 ## ⚙️ Configuration
@@ -53,4 +45,3 @@ The installation is driven by `airootfs/root/config.yaml`. You can edit this fil
 
 ## 🛠️ Development
 To modify the installer, edit `airootfs/root/install_script.py`.
-To add new default assets, modify `prepare_assets.sh`.
