@@ -15,7 +15,7 @@ packages:
   - hyprland
   - waybar
   - wofi
-  - kitty
+  - foot
   - vim
   - nano
   - wget

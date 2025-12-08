@@ -42,26 +42,15 @@ The script will launch and ask you for:
 
 ## 🎨 What you get
 *   **Base System**: Arch Linux Kernel, Firmware, Base-devel.
-*   **Desktop**: Hyprland (Wayland), Waybar, Wofi, Kitty.
+*   **Desktop**: Hyprland (Wayland), Waybar, Wofi, **Foot**.
 *   **Theming**: Dracula GTK Theme, Custom Wallpapers, Icons.
-*   **Tools**: Metasploit, Nmap, BurpSuite (via AUR/PenTools) - *Downloading directly to disk*.
-*   **Audio**: Pipewire + Wireplumber.
 
-## ⚙️ Customization
-Before running the script, you can edit `airootfs/root/config.yaml` to change:
-*   Default Package List.
-*   Username / Passwords.
-*   Timezone / Locale.
-
-## ⚠️ Troubleshooting
-*   **"No space left on device"**: This is fixed. The script now downloads generic assets directly to your target partition, bypassing RAM limits.
-*   **"Signature errors"**: The script automatically refreshes Arch Keyrings before starting.
-*   **VirtualBox Users**: Ensure **3D Acceleration** is ENABLED in your VM Display settings. Hyprland requires this to boot effectively.
+...
 
 ## ⌨️ Shortcuts (Hyprland)
 | Key Combination | Action |
 |-----------------|--------|
-| `SUPER + Q` | Open Terminal (Kitty) |
+| `SUPER + Q` | Open Terminal (**Foot**) |
 | `SUPER + R` | Open App Launcher (Wofi) |
 | `SUPER + C` | Close Active Window |
 | `SUPER + M` | Exit Hyprland (Logout) |
