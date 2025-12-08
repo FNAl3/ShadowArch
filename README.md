@@ -11,7 +11,15 @@ You do NOT need to download a custom ISO. You can install ShadowArch directly fr
 Download the official [Arch Linux ISO](https://archlinux.org/download/), flash it to a USB, and boot it.
 
 ### 2. Clone & Run
-Connect to the internet, then run the following commands:
+Connect to the internet.
+
+> **Tip**: To avoid running out of RAM (Live ISO limitation), mount your target disk to `/mnt` and clone the repo there.
+> ```bash
+> mount /dev/sda3 /mnt  # Replace with your partition
+> cd /mnt
+> ```
+
+Run the following commands:
 
 ```bash
 # 1. Install Git
