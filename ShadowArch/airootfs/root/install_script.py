@@ -192,29 +192,48 @@ def configure_system(config):
     
     keymap = config.get('keymap', 'us')
     
-    # Copy custom dotfiles (skel) from Live ISO to Target System
+    # PATH RESOLUTION FOR GIT INSTALLER
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    # Assuming script is in airootfs/root/, parent is airootfs
+    AIROOTFS_DIR = os.path.dirname(SCRIPT_DIR) 
+
+    # Copy custom dotfiles (skel) from Repo to Target System
     logging.info("Copying custom dotfiles...")
-    run_command("cp -r /etc/skel/. /mnt/etc/skel/")
+    skel_source = os.path.join(AIROOTFS_DIR, 'etc', 'skel')
+    if os.path.exists(skel_source):
+        run_command(f"cp -r {skel_source}/. /mnt/etc/skel/")
+    else:
+        logging.warning(f"Skel directory not found at {skel_source}")
     
-    # Copy custom themes and backgrounds (since they are not in repos)
+    # Copy custom themes and backgrounds
     logging.info("Copying custom themes and assets...")
     run_command("mkdir -p /mnt/usr/share/themes")
     run_command("mkdir -p /mnt/usr/share/backgrounds")
     
-    # Only copy if they exist (to prevent errors if user didn't run download script)
-    if os.path.exists("/usr/share/themes/Dracula"):
-        run_command("cp -r /usr/share/themes/Dracula /mnt/usr/share/themes/")
-        
-    if os.path.exists("/usr/share/backgrounds/shadowk.png"):
-        run_command("cp /usr/share/backgrounds/shadowk.png /mnt/usr/share/backgrounds/")
-    
-    # Write configuration script to be run inside chroot
+    # Dracula Theme
+    dracula_source = os.path.join(AIROOTFS_DIR, 'usr', 'share', 'themes', 'Dracula')
+    if os.path.exists(dracula_source):
+        run_command(f"cp -r {dracula_source} /mnt/usr/share/themes/")
+    else:
+        logging.warning("Dracula theme not found in repo. Did you run prepare_iso.sh? Skipping.")
+
+    # Wallpapers
+    bg_source = os.path.join(AIROOTFS_DIR, 'usr', 'share', 'backgrounds', 'shadowk.png') 
+    if os.path.exists(bg_source):
+        run_command(f"cp {bg_source} /mnt/usr/share/backgrounds/")
+    else:
+         logging.warning("Wallpaper shadowk.png not found.")
+
+    # Reverted SDDM copy per user request
 
     # Deploy Post-Install Wizard
     logging.info("Deploying Shadow Wizard...")
-    if os.path.exists("/root/shadow_wizard.sh"):
-        run_command("cp /root/shadow_wizard.sh /mnt/usr/local/bin/shadow-wizard")
+    wizard_source = os.path.join(SCRIPT_DIR, 'shadow_wizard.sh')
+    if os.path.exists(wizard_source):
+        run_command(f"cp {wizard_source} /mnt/usr/local/bin/shadow-wizard")
         run_command("chmod +x /mnt/usr/local/bin/shadow-wizard")
+    else:
+        logging.warning(f"Shadow Wizard not found at {wizard_source}")
 
     import textwrap
     setup_script = textwrap.dedent(f"""\
