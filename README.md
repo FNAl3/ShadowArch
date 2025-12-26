@@ -45,6 +45,11 @@ The script will launch and ask you for:
 *   **Desktop**: Hyprland (Wayland), Waybar, Wofi, **Foot**.
 *   **Theming**: Dracula GTK Theme, Custom Wallpapers, Icons.
 
+## 📂 Tools Locations
+*   **PenTools**: Installed to `/opt/PenTools`
+*   **Security Tools**: Installed via AUR to standard system paths (e.g., `/usr/bin`)
+*   **Shadow Wizard**: Installed directly to `/usr/local/bin/shadow-wizard`
+
 ...
 
 ## ⌨️ Shortcuts (Hyprland)
