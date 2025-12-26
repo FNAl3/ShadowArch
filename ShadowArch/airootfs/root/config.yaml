@@ -40,8 +40,7 @@ packages:
   - xf86-video-ati
   - xf86-video-nouveau
   - xf86-video-fbdev
-  - nvidia
-  - nvidia-utils
+  - xf86-video-vmware
   - egl-wayland
   - virtualbox-guest-utils
   # Essential Audio & UI
